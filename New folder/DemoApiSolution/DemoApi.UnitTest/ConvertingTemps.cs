@@ -1,4 +1,4 @@
-﻿namespace DemoApi.UnitTests;
+﻿namespace DemoApi.UnitTest;
 public class ConvertingTemperatures
 {
     [Theory]

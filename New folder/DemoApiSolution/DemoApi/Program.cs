@@ -1,4 +1,5 @@
-using DemoApi;
+
+using DemoApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add services to the container.
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<TemperatureConverterService>();
+builder.Services.AddScoped<ICalculateFees, UpdatedFeeCalculator>();
+builder.Services.AddScoped<ISystemTime, SystemTime>();
 
 var app = builder.Build();
 
@@ -17,18 +26,20 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.MapGet("/temperatures/farenheit/{temp:float}/celcius", (float temp) =>
+app.MapGet("/temperatures/farenheit/{temp:float}/celcius", (float temp, TemperatureConverterService service) =>
 {
-    var result = TemperatureConverter.ConvertFromF(temp);
-    return new ConversionResponse(temp, result);
+
+    return service.ConvertFtoC(temp);
 });
 
-app.MapGet("/temperatures/celcius/{temp:float}/farenheit", (float temp) =>
+app.MapGet("/temperatures/celcius/{temp:float}/farenheit", (float temp, TemperatureConverterService service) =>
 {
-    var result = TemperatureConverter.ConvertFromC(temp);
-    return new ConversionResponse(temp, result);
+
+    return service.ConvertCtoF(temp);
 });
 
 app.Run(); // "Blocking Call"
 
 public record ConversionResponse(float F, float C);
+
+public partial class Program { }
